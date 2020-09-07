@@ -1,10 +1,8 @@
-package bitfield;
-
 import java.lang.StringBuilder;
 
 public class Bitfield {
-	private long [] field;
-	private boolean inverted;
+	private final long [] field;
+	private final boolean inverted;
 	
 	private Bitfield (long [] f, boolean i) {
 		field = f;
@@ -36,13 +34,16 @@ public class Bitfield {
 			throw new IllegalArgumentException("Length must be positive!");
 		}
 		inverted = i;
-		l = wordLengthFromBitLength(l);
-		l = Math.max(l, bits.length);
-		field = new long [l];
-		for (int j = 0; j < l; ++j) {
-			for (int k = 0; k < 8; ++k) {
+		int length = wordLengthFromBitLength(Math.min(l, bits.length * 8));
+		field = new long [length];
+		for (int j = 0; j < length - 1; j++) {
+			for (int k = 0; k < 8; k++) {
 				field [j] |= bits [j * 8 + k] << k;
 			}
+		}
+		
+		for (int k = 0; k < l % 8; k++) {
+			field [length - 1] |= bits [(length - 1) * 8 + k] << k;
 		}
 	}
 	
@@ -63,20 +64,25 @@ public class Bitfield {
 			throw new IllegalArgumentException("Length must be positive!");
 		}
 		inverted = i;
-		l = wordLengthFromBitLength(l);
-		l = Math.max(l, bits.length);
-		field = new long [l];
-		for (int j = 0; j < l; ++j) {
-			for (int k = 0; k < 64; ++k) {
-				if (bits [j * 8 + k]) {
+		int length = wordLengthFromBitLength(Math.min(l, bits.length));
+		field = new long [length];
+		for (int j = 0; j < length - 1; j++) {
+			for (int k = 0; k < 64; k++) {
+				if (bits [j * 64 + k]) {
 					field [j] |= 1 << k;
 				}
+			}
+		}
+		
+		for (int k = 0; k < l % 64; k++) {
+			if (bits [(length - 1) * 64 + k]) {
+				field [length - 1] |= 1 << k;
 			}
 		}
 	}
 	
 	public Bitfield (boolean [] bits, boolean i) {
-		this(bits, i, bits.length * 64);
+		this(bits, i, bits.length);
 	}
 	
 	public Bitfield (boolean [] bits, int l) {
@@ -212,8 +218,11 @@ public class Bitfield {
 	public String toString (boolean leftToRight) {
 		String str = "";
 		if (leftToRight) {
+			StringBuilder sb;
 			for (int i = 0; i < this.field.length; i++) {
-				str += Long.toBinaryString(this.getLong(i));
+				sb = new StringBuilder (Long.toBinaryString(this.getLong(i)));
+				sb.reverse();
+				str += sb.toString();
 			}
 			return str;
 		} else {
