@@ -169,22 +169,22 @@ public class Bitfield {
 	}
 	
 	public boolean getBit (int i) {
-		int wordIndex = i / 64;
-		int inWordIndex = i % 64;
+		int wordIndex = i >> 6;
+		int inWordIndex = i & 0b111111;
 		
 		return (wordIndex > (this.field.length - 1) || wordIndex < 0) ? this.inverted : ((this.getLong(wordIndex) << inWordIndex) == 0 ? false : true);
 	}
 	
 	private static void setBitInArray (long [] set, int i) {
-		int wordIndex = i / 64;
-		int inWordIndex = i % 64;
+		int wordIndex = i >> 6;
+		int inWordIndex = i & 0b111111;
 		
 		set[wordIndex] |= 1L << inWordIndex;
 	}
 	
 	private static void unsetBitInArray (long [] unset, int i) {
-		int wordIndex = i / 64;
-		int inWordIndex = i % 64;
+		int wordIndex = i >> 6;
+		int inWordIndex = i & 0b111111;
 		
 		unset[wordIndex] &= ~(1L << inWordIndex);
 	}
