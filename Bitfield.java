@@ -215,16 +215,16 @@ public class Bitfield {
 		return this.getBit(i) ? this.unsetBit(i) : this.setBit(i);
 	}
 	
-	public String toString (boolean leftToRight) {
+	public String toString (boolean littleEndian) {
 		String str = "";
-		if (leftToRight) {
+		if (littleEndian) {
 			StringBuilder sb;
-			for (int i = 0; i < this.field.length; i++) {
-				sb = new StringBuilder (Long.toBinaryString(this.getLong(i)));
-				sb.reverse();
-				str += sb.toString();
+			for (int i = this.field.length - 1; i >= 0; i--) {
+				str += Long.toBinaryString(this.getLong(i));
 			}
-			return str;
+			StringBuilder sb = new StringBuilder (str);
+			sb.reverse();
+			return sb.toString();
 		} else {
 			StringBuilder sb = new StringBuilder (this.toString(true));
 			sb.reverse();
