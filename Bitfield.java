@@ -1,6 +1,6 @@
 import java.lang.StringBuilder;
 
-public class Bitfield {
+public class Bitfield implements Cloneable {
 	private final long [] field;
 	private final boolean inverted;
 	
